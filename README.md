@@ -66,7 +66,9 @@ Imagine the following:
 The configuration file consists of 2 main parts - `config` & `maclist`. Both are a list of objects, confguration objects, and a list of macaddresses that is used to provide each machine its specific ipxe-script and configuration.  
 `config` contains a list of configuration
 
-Example of a configuration file:
+For more information regarding the specific configuration parameters for Harvester see: [https://github.com/harvester/docs/blob/main/docs/install/harvester-configuration.md](https://github.com/harvester/docs/blob/main/docs/install/harvester-configuration.md)
+
+An example configuration file showing different configuration for each location:
 
 ```yaml
 config:
