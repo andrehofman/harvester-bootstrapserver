@@ -54,9 +54,197 @@ What happens with the above script is that it sets a label with `:loop`, Then it
 
 Source: [https://ipxe.org/embed](https://ipxe.org/embed)
 
+As I use Libvirtd (KVM) I set the boot order to `hd,cdrom` that way the machine will try to boot from disk, which it can't, wand proceeds to boot from the cdrom - the ipxe.iso file. Fetches the specific ipxe script for that machine, and continues with the installation. Upon the next boot the `hd` is bootable so it will boot from the fresh installed Harvester.
+
 ### Configuration Data
 
-Ipsum
+Imagine the following:
+
+- There are 2 locations, that have both an isolated Harvester Cluster setup. Let's call the `location_X` & `location_Y`.
+- Both locations have their own specific configuration for about IP addresses, and maybe even network interfaces due to differences of hardware.
+
+The configuration file consists of 2 main parts - `config` & `maclist`. Both are a list of objects, confguration objects, and a list of macaddresses that is used to provide each machine its specific ipxe-script and configuration.  
+`config` contains a list of configuration
+
+Example of a configuration file:
+
+```yaml
+config:
+  - cluster: location_X
+    config_create: &location_X_create
+      token: d506621a3d4acdf60d62475f1b2cb681
+      os:
+        hostname: harvester01
+        ssh_authorized_keys:
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII9lnqlqqlHszXPP8zHFlqrQ4utzVJMSTJI2Qba+zE1s sshkey_X
+          - github:your_username
+        password: 5up3rS3cr3t
+        dns_nameservers:
+          - 192.168.178.3
+        ntp_servers:
+          - 0.pool.ntp.org
+          - 1.pool.ntp.org
+      install:
+        mode: create
+        networks:
+          harvester-mgmt:
+            interfaces:
+            - name: enp1s0
+            method: dhcp
+        device: /dev/vda
+        iso_url: http://192.168.178.7/harvester/0.3.0/harvester-amd64.iso
+        vipMode: static
+        vip: 192.168.178.40
+        poweroff: false
+    config_join: &location_X_join
+      server_url: https://192.168.178.41:8443
+      token: d506621a3d4acdf60d62475f1b2cb681
+      os:
+        ssh_authorized_keys:
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII9lnqlqqlHszXPP8zHFlqrQ4utzVJMSTJI2Qba+zE1s sshkey_X
+          - github:your_username
+        password: 5up3rS3cr3t 
+        dns_nameservers:
+          - 192.168.178.3
+        ntp_servers:
+          - 0.pool.ntp.org
+          - 1.pool.ntp.org
+      install:
+        mode: join
+        networks:
+          harvester-mgmt:
+            interfaces:
+            - name: enp1s0
+            method: dhcp
+        mgmt_interface: enp1s0
+        device: /dev/vda
+        iso_url: http://192.168.178.7/harvester/0.3.0/harvester-amd64.iso
+        poweroff: false
+  - cluster: location_Y
+    config_create: &loaction_Y_join
+      token: 612c99d263fe6b8acb56f0b964e07d0a
+      os:
+        hostname: harvester01
+        ssh_authorized_keys:
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII9lnqlqqlHszXPP8zHFlqrQ4utzVJMSTJI2Qba+zE1s andre@amd
+          - github:your_username
+        password: 5up3rS3cr3t
+        dns_nameservers:
+          - 172.16.128.3
+        ntp_servers:
+          - ntp.your.org
+          - ntp.your.org
+      install:
+        mode: create
+        networks:
+          harvester-mgmt:
+            interfaces:
+            - name: enp1s0
+            method: dhcp
+        device: /dev/vda
+        iso_url: http://192.168.178.7/harvester/0.3.0/harvester-amd64.iso
+        vipMode: static
+        vip: 172.16.128.40
+        poweroff: false
+    config_join: &location_Y_join
+      server_url: https://172.16.128.41:8443
+      token: 612c99d263fe6b8acb56f0b964e07d0a
+      os:
+        ssh_authorized_keys:
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII9lnqlqqlHszXPP8zHFlqrQ4utzVJMSTJI2Qba+zE1s andre@amd
+          - github:your_username
+        password: 5up3rS3cr3t 
+        dns_nameservers:
+          - 172.16.128.3
+        ntp_servers:
+          - 0.pool.ntp.org
+          - 1.pool.ntp.org
+      install:
+        mode: join
+        networks:
+          harvester-mgmt:
+            interfaces:
+            - name: enp1s0
+            method: dhcp
+        mgmt_interface: enp1s0
+        device: /dev/vda
+        iso_url: http://192.168.178.7/harvester/0.3.0/harvester-amd64.iso
+        poweroff: false
+maclist:
+# harvester v0.2.0
+- macaddress: 52:54:00:52:cb:c1
+  values:
+    ipaddress: 192.168.178.31
+    netmask: 255.255.255.0
+    gateway: 192.168.178.1
+    interface: enp1s0
+    version: "0.2.0"
+    type: create
+    config: 
+      << : *location_X_create
+- macaddress: 52:54:00:7d:1a:a2
+  values:
+    ipaddress: 192.168.178.32
+    netmask: 255.255.255.0
+    gateway: 192.168.178.1
+    interface: enp1s0
+    version: "0.2.0"
+    type: join
+    config:
+      << : *location_X_join
+- macaddress: 52:54:00:31:3e:b8
+  values:
+    ipaddress: 192.168.178.33
+    netmask: 255.255.255.0
+    gateway: 192.168.178.1
+    interface: enp1s0
+    version: "0.2.0"
+    type: join
+    config:
+      << : *location_X_join
+# harvester v0.3.0
+- macaddress: 52:54:00:c1:6b:56
+  values:
+    ipaddress: 172.16.128.41
+    netmask: 255.255.252.0
+    gateway: 172.16.128.254
+    interface: ens3
+    version: 0.3.0
+    type: create
+    config:
+      << : *location_Y_create
+- macaddress: 52:54:00:14:26:90
+  values:
+    ipaddress: 172.16.128.42
+    netmask: 255.255.252.0
+    gateway: 172.16.128.254
+    interface: ens3
+    version: 0.3.0
+    type: join
+    config:
+      << : *location_Y_join
+- macaddress: 52:54:00:27:8c:78
+  values:
+    ipaddress: 172.16.128.43
+    netmask: 255.255.252.0
+    gateway: 172.16.128.254
+    interface: ens3
+    version: 0.3.0
+    type: join
+    config:
+      << : *location_Y_join
+- macaddress: 52:54:00:9d:cb:2f
+  values:
+    ipaddress: 172.16.128.44
+    netmask: 255.255.252.0
+    gateway: 172.16.128.254
+    interface: ens3
+    version: 0.3.0
+    type: join
+    config:
+      << : *location_Y_join
+
+```
 
 ### How To Build
 
