@@ -61,6 +61,7 @@ As I use Libvirtd (KVM) I set the boot order to `hd,cdrom` that way the machine 
 Imagine the following:
 
 - There are 2 locations, that have both an isolated Harvester Cluster setup. Let's call the `location_X` & `location_Y`.
+- Both locations will have 3 Harvester Nodes.
 - Both locations have their own specific configuration for about IP addresses, and maybe even network interfaces due to differences of hardware.
 
 The configuration file consists of 2 main parts - `config` & `maclist`. Both are a list of objects, confguration objects, and a list of macaddresses that is used to provide each machine its specific ipxe-script and configuration.  
