@@ -17,7 +17,8 @@ This way it could be used as a bootstrap service for Harvester.
 
 ## How it works
 
-lorum ipsum
+
+[process](process.png) overview
 
 ### iPXE script
 
@@ -56,6 +57,8 @@ Source: [https://ipxe.org/embed](https://ipxe.org/embed)
 
 As I use Libvirtd (KVM) I set the boot order to `hd,cdrom` that way the machine will try to boot from disk, which it can't, wand proceeds to boot from the cdrom - the ipxe.iso file. Fetches the specific ipxe script for that machine, and continues with the installation. Upon the next boot the `hd` is bootable so it will boot from the fresh installed Harvester.
 
+For baremetal servers it is quite often possible to set a onetime boot-device via the iDRAC or iLOM, so your preferred method to boot onetime from the generate ipxe.iso might be different.
+
 ### Configuration Data
 
 Imagine the following:
@@ -79,14 +82,14 @@ config:
       os:
         hostname: harvester01
         ssh_authorized_keys:
-          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII9lnqlqqlHszXPP8zHFlqrQ4utzVJMSTJI2Qba+zE1s sshkey_X
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII9lnqlqqlHszXPP8zHFlqrQ4utzVJMSTJI2Qba+zE1s sshkey-X
           - github:your_username
         password: 5up3rS3cr3t
         dns_nameservers:
           - 192.168.178.3
         ntp_servers:
-          - 0.pool.ntp.org
-          - 1.pool.ntp.org
+          - ntp.data.centerx.org
+          - ntp.data.centerx.org
       install:
         mode: create
         networks:
@@ -104,14 +107,14 @@ config:
       token: d506621a3d4acdf60d62475f1b2cb681
       os:
         ssh_authorized_keys:
-          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII9lnqlqqlHszXPP8zHFlqrQ4utzVJMSTJI2Qba+zE1s sshkey_X
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII9lnqlqqlHszXPP8zHFlqrQ4utzVJMSTJI2Qba+zE1s sshkey-X
           - github:your_username
         password: 5up3rS3cr3t 
         dns_nameservers:
           - 192.168.178.3
         ntp_servers:
-          - 0.pool.ntp.org
-          - 1.pool.ntp.org
+          - ntp.data.centerx.org
+          - ntp.data.centerx.org
       install:
         mode: join
         networks:
@@ -129,7 +132,7 @@ config:
       os:
         hostname: harvester01
         ssh_authorized_keys:
-          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII9lnqlqqlHszXPP8zHFlqrQ4utzVJMSTJI2Qba+zE1s andre@amd
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII9lnqlqqlHszXPP8zHFlqrQ4utzVJMSTJI2Qba+zE1s sshkey-Y
           - github:your_username
         password: 5up3rS3cr3t
         dns_nameservers:
@@ -142,7 +145,7 @@ config:
         networks:
           harvester-mgmt:
             interfaces:
-            - name: enp1s0
+            - name: ens3
             method: dhcp
         device: /dev/vda
         iso_url: http://192.168.178.7/harvester/0.3.0/harvester-amd64.iso
@@ -154,20 +157,20 @@ config:
       token: 612c99d263fe6b8acb56f0b964e07d0a
       os:
         ssh_authorized_keys:
-          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII9lnqlqqlHszXPP8zHFlqrQ4utzVJMSTJI2Qba+zE1s andre@amd
+          - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII9lnqlqqlHszXPP8zHFlqrQ4utzVJMSTJI2Qba+zE1s sshkey-Y
           - github:your_username
         password: 5up3rS3cr3t 
         dns_nameservers:
           - 172.16.128.3
         ntp_servers:
-          - 0.pool.ntp.org
-          - 1.pool.ntp.org
+          - ntp.your.org
+          - ntp.your.org
       install:
         mode: join
         networks:
           harvester-mgmt:
             interfaces:
-            - name: enp1s0
+            - name: ens3
             method: dhcp
         mgmt_interface: enp1s0
         device: /dev/vda
