@@ -55,7 +55,7 @@ What happens with the above script is that it sets a label with `:loop`, Then it
 
 Source: [https://ipxe.org/embed](https://ipxe.org/embed)
 
-As I use Libvirtd (KVM) I set the boot order to `hd,cdrom` that way the machine will try to boot from disk, which it can't, wand proceeds to boot from the cdrom - the ipxe.iso file. Fetches the specific ipxe script for that machine, and continues with the installation. Upon the next boot the `hd` is bootable so it will boot from the fresh installed Harvester.
+As I use Libvirtd (KVM) I define a cdrom device when I execute `virt-install`, and set the boot order to `hd,cdrom`. That way the machine will try to boot from disk - which is not possible (yet) - and proceeds to boot from the cdrom - the ipxe.iso file. Fetches the specific ipxe script for that machine, and continues with the installation. Upon the next boot the `hd` is bootable so it will boot from the fresh installed Harvester.
 
 For baremetal servers it is quite often possible to set a onetime boot-device via the iDRAC or iLOM, so your preferred method to boot onetime from the generate ipxe.iso might be different.
 
