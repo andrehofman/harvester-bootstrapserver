@@ -250,4 +250,31 @@ maclist:
 
 ### How To Build
 
-Ipsum
+Move to the root of this git-repository, and execute:
+
+    go build
+
+The result should be a executable in the root called; `phs`
+
+### Deployment in Kubernetes (Kind)
+
+Get kind:
+
+    curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
+    chmod +x ./kind
+
+Move to the root of this cloned repository:
+
+    cd k8s
+    kind create cluster --config=kind-cluster.yaml --name phs
+    kubectl create namespace phs
+    kubectl create configmap --namespace phs --from-file=data.yaml
+    kubectl create -f deployment.yaml
+    kubectl expose deployment phs
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+    kubectl create -f phs-nginx-ingress.yaml
+
+From that point on you should be able to curl the server at http://localhost:80
+
+    curl http://localhost/all
+

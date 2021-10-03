@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phs
+  labels:
+    app: phs
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: phs
+  template:
+    metadata:
+      labels:
+        app: phs
+    spec:
+      containers:
+      - name: phs
+        env:
+          - name: CONFIG_FILE
+            value: ${CONFIG_FILE:-/config/data.yaml}
+        image: phs:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 10000
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config/
+      volumes:
+      - name: config-volume
+        configMap:
+          name: phs-data

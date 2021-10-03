@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -107,8 +108,15 @@ func handleRequests() {
 func main() {
 	fmt.Println("Rest API v2.0 - Mux Routers")
 
+	// Get location of the configuration data, else exit
+	configFile := os.Getenv("CONFIG_FILE")
+	if configFile == "" {
+		log.Fatalf("Please, set the CONFIG_FILE environment variable to a valid value")
+		return
+	}
+
 	// read data from file
-	buf, err := ioutil.ReadFile("data.yaml")
+	buf, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
