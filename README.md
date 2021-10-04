@@ -17,8 +17,7 @@ This way it could be used as a bootstrap service for Harvester.
 
 ## How it works
 
-
-[process](process.png) overview
+![process](boot-process.svg) overview
 
 ### iPXE script
 
