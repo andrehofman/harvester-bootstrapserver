@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -109,14 +110,14 @@ func main() {
 	fmt.Println("Rest API v2.0 - Mux Routers")
 
 	// Get location of the configuration data, else exit
-	configFile := os.Getenv("CONFIG_FILE")
-	if configFile == "" {
+	configfile := os.Getenv("CONFIG_FILE")
+	if configfile == "" {
 		log.Fatalf("Please, set the CONFIG_FILE environment variable to a valid value")
 		return
 	}
 
 	// read data from file
-	buf, err := ioutil.ReadFile(configFile)
+	buf, err := ioutil.ReadFile(filepath.Join("/config/", configfile))
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}

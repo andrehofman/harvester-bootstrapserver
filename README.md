@@ -71,7 +71,7 @@ The configuration file consists of 2 main parts - `config` & `maclist`. Both are
 
 For more information regarding the specific configuration parameters for Harvester see: [https://github.com/harvester/docs/blob/main/docs/install/harvester-configuration.md](https://github.com/harvester/docs/blob/main/docs/install/harvester-configuration.md)
 
-[Take a look](k8s/example_data.yaml) at an example configuration file showing different configuration for different locations.
+[Take a look](k8s/data.yaml) at an example configuration file showing different configuration for different locations.
 
 ### How To Build
 
@@ -90,12 +90,24 @@ Get kind:
 
 Move to the root of this cloned repository:
 
-    cd k8s
-    kind create cluster --config=kind-cluster.yaml --name phs
+    kind create cluster --config=k8s/kind-cluster.yaml --name phs
+
+While waiting we can build the container image:
+
+    cd ../
+    buildah build -t phs
+    # move the image to the docker context:
+    skopeo copy containers-storage:localhost/phs:latest docker-daemon:phs:latest
+
+When the Kind cluster is up:
+
+    # load the container image into the cluster
+    kind load docker-image phs:latest --name phs
+    # deploy the pxe-http-server
     kubectl create namespace phs
-    kubectl create configmap --namespace phs --from-file=data.yaml
-    kubectl create -f deployment.yaml
-    kubectl expose deployment phs
+    kubectl create configmap phs-data --namespace phs --from-file=k8s/example_data.yaml
+    kubectl create --namespace phs -f k8s/deployment.yaml
+    kubectl expose --namespace phs deployment phs
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
     kubectl create -f phs-nginx-ingress.yaml
 

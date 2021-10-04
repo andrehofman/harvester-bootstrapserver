@@ -50,7 +50,7 @@ config:
         iso_url: http://192.168.178.7/harvester/0.3.0/harvester-amd64.iso
         poweroff: false
   - cluster: location_Y
-    config_create: &loaction_Y_join
+    config_create: &location_Y_create
       token: 612c99d263fe6b8acb56f0b964e07d0a
       os:
         hostname: harvester01
