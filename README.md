@@ -12,7 +12,7 @@ This way it could be used as a bootstrap service for Harvester.
 ## Requirements
 
 - iPXE script (see [example](#ipxe-script))
-- data.yaml   (see [data.yaml](k8s/data.yaml))
+- data.yaml   (see [data.yaml](k8s/example_data.yaml))
 - The binary from this code (check [how to build](#how-to-build))
 
 ## How it works
