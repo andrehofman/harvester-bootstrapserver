@@ -15,7 +15,9 @@ import (
 )
 
 type List struct {
-	Maclist []struct {
+	ConfigServer   string `json:"server"`
+	DownloadServer string `json:"downloadserver"`
+	Maclist        []struct {
 		Macaddress string `json:"macaddress"`
 		Values     struct {
 			Ipaddress string      `json:"ipaddress,omitempty"`
@@ -66,8 +68,8 @@ func returnIPXEScript(w http.ResponseWriter, r *http.Request) {
 		i := MacData.Indices[key]
 		fmt.Println("Found match: ", MacData.Maclist[i].Macaddress, MacData.Maclist[i].Values.Ipaddress, MacData.Maclist[i].Values.Mode)
 		fmt.Fprintf(w, "#!ipxe\n")
-		fmt.Fprintf(w, "kernel http://192.168.178.7/harvester/"+MacData.Maclist[i].Values.Version+"/vmlinuz ip="+MacData.Maclist[i].Values.Ipaddress+"::"+MacData.Maclist[i].Values.Gateway+":"+MacData.Maclist[i].Values.Netmask+":harvester:"+MacData.Maclist[i].Values.Interface+":off rd.cos.disable rd.noverifyssl root=live:http://192.168.178.7/harvester/"+MacData.Maclist[i].Values.Version+"/rootfs.squashfs console=ttyS0 console=tty1 harvester.install.automatic=true harvester.install.config_url=http://192.168.178.7:10000/config/"+MacData.Maclist[i].Macaddress+" net.ifnames=1\n")
-		fmt.Fprintf(w, "initrd http://192.168.178.7/harvester/"+MacData.Maclist[i].Values.Version+"/initrd\n")
+		fmt.Fprintf(w, "kernel "+MacData.DownloadServer+"/harvester/"+MacData.Maclist[i].Values.Version+"/harvester-"+MacData.Maclist[i].Values.Version+"-vmlinuz-amd64 ip="+MacData.Maclist[i].Values.Ipaddress+"::"+MacData.Maclist[i].Values.Gateway+":"+MacData.Maclist[i].Values.Netmask+":harvester:"+MacData.Maclist[i].Values.Interface+":off rd.cos.disable rd.noverifyssl root=live:"+MacData.DownloadServer+"/harvester/"+MacData.Maclist[i].Values.Version+"/harvester-"+MacData.Maclist[i].Values.Version+"-rootfs-amd64.squashfs console=ttyS0 console=tty1 harvester.install.automatic=true harvester.install.config_url=http://"+MacData.ConfigServer+":10000/config/"+MacData.Maclist[i].Macaddress+" net.ifnames=1\n")
+		fmt.Fprintf(w, "initrd "+MacData.DownloadServer+"/harvester/"+MacData.Maclist[i].Values.Version+"/harvester-"+MacData.Maclist[i].Values.Version+"-initrd-amd64\n")
 		fmt.Fprintf(w, "boot\n")
 	} else {
 		fmt.Println("No match found for: ", key)

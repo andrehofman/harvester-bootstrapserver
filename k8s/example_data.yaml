@@ -1,3 +1,5 @@
+server: 192.168.178.6
+downloadserver: https://releases.rancher.com
 config:
   - cluster: location_X
     config_create: &location_X_create
@@ -21,7 +23,7 @@ config:
             - name: enp1s0
             method: dhcp
         device: /dev/vda
-        iso_url: http://192.168.178.7/harvester/0.3.0/harvester-amd64.iso
+        iso_url: https://releases.rancher.com/harvester/v0.3.0-rc1/harvester-v0.3.0-rc1-amd64.iso
         vipMode: static
         vip: 192.168.178.40
         poweroff: false
@@ -47,7 +49,7 @@ config:
             method: dhcp
         mgmt_interface: enp1s0
         device: /dev/vda
-        iso_url: http://192.168.178.7/harvester/0.3.0/harvester-amd64.iso
+        iso_url: https://releases.rancher.com/harvester/v0.3.0-rc1/harvester-v0.3.0-rc1-amd64.iso
         poweroff: false
   - cluster: location_Y
     config_create: &location_Y_create
@@ -71,7 +73,7 @@ config:
             - name: ens3
             method: dhcp
         device: /dev/vda
-        iso_url: http://192.168.178.7/harvester/0.3.0/harvester-amd64.iso
+        iso_url: https://releases.rancher.com/harvester/v0.3.0-rc1/harvester-v0.3.0-rc1-amd64.iso
         vipMode: static
         vip: 172.16.128.40
         poweroff: false
@@ -97,7 +99,7 @@ config:
             method: dhcp
         mgmt_interface: enp1s0
         device: /dev/vda
-        iso_url: http://192.168.178.7/harvester/0.3.0/harvester-amd64.iso
+        iso_url: https://releases.rancher.com/harvester/v0.3.0-rc1/harvester-v0.3.0-rc1-amd64.iso
         poweroff: false
 maclist:
 # harvester v0.2.0
@@ -107,7 +109,7 @@ maclist:
     netmask: 255.255.255.0
     gateway: 192.168.178.1
     interface: enp1s0
-    version: "0.2.0"
+    version: "v0.2.0"
     type: create
     config: 
       << : *location_X_create
@@ -117,7 +119,7 @@ maclist:
     netmask: 255.255.255.0
     gateway: 192.168.178.1
     interface: enp1s0
-    version: "0.2.0"
+    version: "v0.2.0"
     type: join
     config:
       << : *location_X_join
@@ -127,7 +129,7 @@ maclist:
     netmask: 255.255.255.0
     gateway: 192.168.178.1
     interface: enp1s0
-    version: "0.2.0"
+    version: "v0.2.0"
     type: join
     config:
       << : *location_X_join
@@ -138,7 +140,7 @@ maclist:
     netmask: 255.255.252.0
     gateway: 172.16.128.254
     interface: ens3
-    version: 0.3.0
+    version: v0.3.0-rc1
     type: create
     config:
       << : *location_Y_create
@@ -148,7 +150,7 @@ maclist:
     netmask: 255.255.252.0
     gateway: 172.16.128.254
     interface: ens3
-    version: 0.3.0
+    version: v0.3.0-rc1
     type: join
     config:
       << : *location_Y_join
@@ -158,7 +160,7 @@ maclist:
     netmask: 255.255.252.0
     gateway: 172.16.128.254
     interface: ens3
-    version: 0.3.0
+    version: v0.3.0-rc1
     type: join
     config:
       << : *location_Y_join
@@ -168,7 +170,7 @@ maclist:
     netmask: 255.255.252.0
     gateway: 172.16.128.254
     interface: ens3
-    version: 0.3.0
+    version: v0.3.0-rc1
     type: join
     config:
       << : *location_Y_join
