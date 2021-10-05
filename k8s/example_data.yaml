@@ -1,4 +1,4 @@
-server: 192.168.178.6
+server: http://192.168.178.6
 downloadserver: https://releases.rancher.com
 config:
   - cluster: location_X
