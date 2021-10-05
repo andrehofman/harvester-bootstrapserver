@@ -8,13 +8,14 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
+	"regexp"
 
 	"github.com/gorilla/mux"
 	yml "sigs.k8s.io/yaml"
 )
 
 type List struct {
+	Indices map[string]int
 	Maclist []struct {
 		Macaddress string `json:"macaddress"`
 		Values     struct {
@@ -71,16 +72,17 @@ func returnIPXEScript(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["macaddr"]
 
-	// fmt.Fprintf(w, "Key: "+key+"\n")
-	for _, v := range MacData.Maclist {
-
-		if strings.ToUpper(v.Macaddress) == strings.ToUpper(key) {
-			fmt.Println("Found match: ", v.Macaddress, v.Values.Ipaddress, v.Values.Mode)
-			fmt.Fprintf(w, "#!ipxe\n")
-			fmt.Fprintf(w, "kernel http://192.168.178.7/harvester/"+v.Values.Version+"/vmlinuz ip="+v.Values.Ipaddress+"::"+v.Values.Gateway+":"+v.Values.Netmask+":harvester:"+v.Values.Interface+":off rd.cos.disable rd.noverifyssl root=live:http://192.168.178.7/harvester/"+v.Values.Version+"/rootfs.squashfs console=ttyS0 console=tty1 harvester.install.automatic=true harvester.install.config_url=http://192.168.178.7:10000/config/"+v.Macaddress+" net.ifnames=1\n")
-			fmt.Fprintf(w, "initrd http://192.168.178.7/harvester/"+v.Values.Version+"/initrd\n")
-			fmt.Fprintf(w, "boot\n")
-		}
+	// lookup in indices, and access it.
+	if match, _ := regexp.MatchString("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$", key); match == true {
+		i := MacData.Indices[key]
+		fmt.Println("Found match: ", MacData.Maclist[i].Macaddress, MacData.Maclist[i].Values.Ipaddress, MacData.Maclist[i].Values.Mode)
+		fmt.Fprintf(w, "#!ipxe\n")
+		fmt.Fprintf(w, "kernel http://192.168.178.7/harvester/"+MacData.Maclist[i].Values.Version+"/vmlinuz ip="+MacData.Maclist[i].Values.Ipaddress+"::"+MacData.Maclist[i].Values.Gateway+":"+MacData.Maclist[i].Values.Netmask+":harvester:"+MacData.Maclist[i].Values.Interface+":off rd.cos.disable rd.noverifyssl root=live:http://192.168.178.7/harvester/"+MacData.Maclist[i].Values.Version+"/rootfs.squashfs console=ttyS0 console=tty1 harvester.install.automatic=true harvester.install.config_url=http://192.168.178.7:10000/config/"+MacData.Maclist[i].Macaddress+" net.ifnames=1\n")
+		fmt.Fprintf(w, "initrd http://192.168.178.7/harvester/"+MacData.Maclist[i].Values.Version+"/initrd\n")
+		fmt.Fprintf(w, "boot\n")
+	} else {
+		fmt.Println("No match found for: ", key)
+		fmt.Fprintf(w, "No match found for: "+key)
 	}
 }
 
@@ -89,11 +91,14 @@ func returnConfig(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["macaddr"]
 
-	for _, v := range MacData.Maclist {
-		if strings.ToUpper(v.Macaddress) == strings.ToUpper(key) {
-			fmt.Println("Found match: ", v.Macaddress, "Sending config...")
-			json.NewEncoder(w).Encode(v.Values.Config)
-		}
+	// lookup in indices, and access it.
+	if match, _ := regexp.MatchString("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$", key); match == true {
+		i := MacData.Indices[key]
+		fmt.Println("Found match: ", MacData.Maclist[i].Macaddress, "Sending config...")
+		json.NewEncoder(w).Encode(MacData.Maclist[i].Values.Config)
+	} else {
+		fmt.Println("No match found for: ", key)
+		fmt.Fprintf(w, "No match found for: "+key)
 	}
 }
 
@@ -131,6 +136,14 @@ func main() {
 	json.Unmarshal([]byte(j), &MacData)
 	if err != nil {
 		fmt.Printf("Error parsing JSON string - %s", err)
+	}
+
+	// Initiate Indices (empty)
+	MacData.Indices = make(map[string]int)
+	// fill indice
+	for i, v := range MacData.Maclist {
+		m := v.Macaddress
+		MacData.Indices[m] = i
 	}
 
 	handleRequests()
