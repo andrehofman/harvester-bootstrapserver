@@ -15,7 +15,6 @@ import (
 )
 
 type List struct {
-	Indices map[string]int
 	Maclist []struct {
 		Macaddress string `json:"macaddress"`
 		Values     struct {
@@ -33,33 +32,23 @@ type List struct {
 		ConfigCreate interface{} `json:"config_create,omitempty"`
 		ConfigJoin   interface{} `json:"config_join,omitempty"`
 	} `json:"config,omitempty"`
+	Indices map[string]int
 }
 
 var MacData List
 
 func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Endpoint Hit: homePage")
-	fmt.Fprintf(w, "<html><title>iPXE Server</title>")
-	fmt.Fprintf(w, "<h1>")
-	fmt.Fprintf(w, "Welcome to the HomePage!\n\n")
-	fmt.Fprintf(w, "</h1>")
-
-	var ipxe_template = "\t#!ipxe\n" +
-		"\tkernel vmlinuz ip={ipaddr}::{gateway}:{netmask}::{interface}:off rd.cos.disable rd.noverifyssl root=live:http://192.168.178.7/harvester/rootfs.squashfs console=ttyS0 console=tty1 harvester.install.automatic=true harvester.install.config_url=http://192.168.178.7/harvester/config-{create|join}.yaml net.ifnames=1\n" +
-		"\tinitrd initrd\n" +
-		"\tboot\n"
-
-	fmt.Fprintf(w, "<div>")
-	fmt.Fprintf(w, "This server generates a iPXE script for a specific machine based on the request parameter.</br>")
-	fmt.Fprintf(w, "For instance; http://192.168.178.7/harvester/ipxe/fe:c6:0b:44:98:03</br>")
-	fmt.Fprintf(w, "</div>")
-	fmt.Fprintf(w, "returns:\n\n")
-	fmt.Fprintf(w, "<pre>")
-	fmt.Fprintf(w, ipxe_template)
-	fmt.Fprintf(w, "</pre>")
-
-	fmt.Fprintf(w, "Source: <a href='https://linuxlink.timesys.com/docs/static_ip' target='_blank'>https://linuxlink.timesys.com/docs/static_ip</a>")
-	fmt.Fprintf(w, "</html>")
+	fmt.Fprintf(w, "Welcome to this Harvester iPXE bootstrap server!\n\n")
+	fmt.Fprintf(w, "This server provides 3 endpoints:\n\n")
+	fmt.Fprintf(w, "\t- /all\t sends entire configuration\n")
+	fmt.Fprintf(w, "\t- /ipxe/<mac address>\t sends an ipxe script specific for that mac address\n")
+	fmt.Fprintf(w, "\t- /config/<mac address>\t sends a harvester bootstrap configuration for that specific server\n\n")
+	// examples
+	fmt.Fprintf(w, "Examples:\n\n")
+	fmt.Fprintf(w, "\t- http://example.org/all\n")
+	fmt.Fprintf(w, "\t- http://example.org/ipxe/AB:cd:Ef:01:F5:c9\n")
+	fmt.Fprintf(w, "\t- http://example.org/config/CD:Ef:01:F5:c9:01\n")
 }
 
 func returnAllMacIPs(w http.ResponseWriter, r *http.Request) {
