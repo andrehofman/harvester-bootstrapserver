@@ -66,12 +66,11 @@ func returnIPXEScript(w http.ResponseWriter, r *http.Request) {
 	// lookup in indices, and access it.
 	if match, _ := regexp.MatchString("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$", key); match == true {
 		if m, ok := MacData.Indices[key]; ok {
-			fmt.Println("Got mac-address; ", m)
-			i := MacData.Indices[key]
-			fmt.Println("Found match: ", MacData.Maclist[i].Macaddress, MacData.Maclist[i].Values.Ipaddress, MacData.Maclist[i].Values.Mode)
+			fmt.Println("Got mac-address from index; ", m)
+			fmt.Println("Found match: ", MacData.Maclist[m].Macaddress, MacData.Maclist[m].Values.Ipaddress, MacData.Maclist[m].Values.Mode)
 			fmt.Fprintf(w, "#!ipxe\n")
-			fmt.Fprintf(w, "kernel "+MacData.DownloadServer+"/harvester/"+MacData.Maclist[i].Values.Version+"/harvester-"+MacData.Maclist[i].Values.Version+"-vmlinuz-amd64 ip="+MacData.Maclist[i].Values.Ipaddress+"::"+MacData.Maclist[i].Values.Gateway+":"+MacData.Maclist[i].Values.Netmask+":harvester:"+MacData.Maclist[i].Values.Interface+":off rd.cos.disable rd.noverifyssl root=live:"+MacData.DownloadServer+"/harvester/"+MacData.Maclist[i].Values.Version+"/harvester-"+MacData.Maclist[i].Values.Version+"-rootfs-amd64.squashfs console=ttyS0 console=tty1 harvester.install.automatic=true harvester.install.config_url="+MacData.ConfigServer+":10000/config/"+MacData.Maclist[i].Macaddress+" net.ifnames=1\n")
-			fmt.Fprintf(w, "initrd "+MacData.DownloadServer+"/harvester/"+MacData.Maclist[i].Values.Version+"/harvester-"+MacData.Maclist[i].Values.Version+"-initrd-amd64\n")
+			fmt.Fprintf(w, "kernel "+MacData.DownloadServer+"/harvester/"+MacData.Maclist[m].Values.Version+"/harvester-"+MacData.Maclist[m].Values.Version+"-vmlinuz-amd64 ip="+MacData.Maclist[m].Values.Ipaddress+"::"+MacData.Maclist[m].Values.Gateway+":"+MacData.Maclist[m].Values.Netmask+":harvester:"+MacData.Maclist[m].Values.Interface+":off rd.cos.disable rd.noverifyssl root=live:"+MacData.DownloadServer+"/harvester/"+MacData.Maclist[m].Values.Version+"/harvester-"+MacData.Maclist[m].Values.Version+"-rootfs-amd64.squashfs console=ttyS0 console=tty1 harvester.install.automatic=true harvester.install.config_url="+MacData.ConfigServer+":10000/config/"+MacData.Maclist[m].Macaddress+" net.ifnames=1\n")
+			fmt.Fprintf(w, "initrd "+MacData.DownloadServer+"/harvester/"+MacData.Maclist[m].Values.Version+"/harvester-"+MacData.Maclist[m].Values.Version+"-initrd-amd64\n")
 			fmt.Fprintf(w, "boot\n")
 		} else {
 			fmt.Println("No match found for: ", key)
@@ -88,10 +87,9 @@ func returnConfig(w http.ResponseWriter, r *http.Request) {
 	// lookup in indices, and access it.
 	if match, _ := regexp.MatchString("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$", key); match == true {
 		if m, ok := MacData.Indices[key]; ok {
-			fmt.Println("Got mac-address; ", m)
-			i := MacData.Indices[key]
-			fmt.Println("Found match: ", MacData.Maclist[i].Macaddress, "Sending config...")
-			json.NewEncoder(w).Encode(MacData.Maclist[i].Values.Config)
+			fmt.Println("Got mac-address from index; ", m)
+			fmt.Println("Found match: ", MacData.Maclist[m].Macaddress, "Sending config...")
+			json.NewEncoder(w).Encode(MacData.Maclist[m].Values.Config)
 		} else {
 			fmt.Println("No match found for: ", key)
 			fmt.Fprintf(w, "No match found for: "+key)
