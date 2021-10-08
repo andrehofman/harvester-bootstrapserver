@@ -76,6 +76,9 @@ func returnIPXEScript(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("No match found for: ", key)
 			fmt.Fprintf(w, "No match found for: "+key)
 		}
+	} else {
+		fmt.Println(key, " is not a valid mac-address ;(")
+		fmt.Fprintf(w, key+" is not a valid mac-address ;(")
 	}
 }
 
@@ -94,6 +97,9 @@ func returnConfig(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("No match found for: ", key)
 			fmt.Fprintf(w, "No match found for: "+key)
 		}
+	} else {
+		fmt.Println(key, " is not a valid mac-address ;(")
+		fmt.Fprintf(w, key+" is not a valid mac-address ;(")
 	}
 }
 
